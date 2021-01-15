@@ -3,8 +3,8 @@ import { getData } from './api/api.js';
 
 class Store {
   weatherData = [];
-  latitude = '123';
-  longitude = '456';
+  latitude = 123;
+  longitude = 456;
 
   constructor() {
     makeAutoObservable(this)

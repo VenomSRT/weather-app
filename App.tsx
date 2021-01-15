@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   PermissionsAndroid,
   Platform,
+  Button,
 } from 'react-native';
 
 import {
@@ -20,13 +21,47 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 
 import Geolocation from '@react-native-community/geolocation';
-import { observer } from 'mobx-react-lite';
+import {observer} from 'mobx-react-lite';
 import store from './store/store';
 
 declare const global: {HermesInternal: null | {}};
 
 const App = observer(() => {
-  
+  const [initialPosition, setInitialPosition]: any = useState('');
+  const [lastPosition, setLastPosition]: any = useState('');
+
+  async function requestLocationPermission() {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Example App',
+          message: 'Example App access to your location ',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('You can use the location');
+        alert('You can use the location');
+      } else {
+        console.log('location permission denied');
+        alert('Location permission denied');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  useEffect(() => {
+    requestLocationPermission();
+  }, []);
+
+  function makeRequestLocation() {
+    Geolocation.getCurrentPosition((position) => {
+      const initialPosition = JSON.stringify(position);
+      setInitialPosition(initialPosition);
+    });
+  }
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -36,9 +71,18 @@ const App = observer(() => {
           <Text style={styles.sectionDescription}>
             {store.latitude} {store.longitude}
           </Text>
-          <TouchableOpacity onPress={() => store.makeChange()}><Text>
-            Make a change
-          </Text></TouchableOpacity>
+          <TouchableOpacity
+            style={styles.testButton}
+            onPress={() => store.makeChange()}>
+            <Text>Make a change</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.testButton}
+            onPress={() => makeRequestLocation()}>
+            <Text>Make request</Text>
+          </TouchableOpacity>
+          <Text>Position is: {initialPosition}</Text>
         </View>
       </SafeAreaView>
     </>
@@ -46,16 +90,6 @@ const App = observer(() => {
 });
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
   sectionContainer: {
     marginTop: 32,
     paddingHorizontal: 24,
@@ -71,17 +105,14 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: Colors.dark,
   },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
+  testButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: '#ddd',
+    borderRadius: 5,
+    maxWidth: 150,
+    marginVertical: 10,
+  }
 });
 
 export default App;
