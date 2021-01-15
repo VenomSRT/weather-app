@@ -12,6 +12,7 @@ class Store {
 
   makeChange() {
     this.latitude = this.latitude + 1;
+    this.longitude = this.longitude + 1;
   }
 
   setWeatherData(longitude: string, latitude: string) {
