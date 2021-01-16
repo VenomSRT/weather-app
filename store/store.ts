@@ -3,21 +3,21 @@ import { getData } from './api/api.js';
 
 class Store {
   weatherData = [];
-  latitude = 123;
-  longitude = 456;
+  latitude = '';
+  longitude = '';
 
   constructor() {
     makeAutoObservable(this)
   }
 
-  makeChange() {
-    this.latitude = this.latitude + 1;
-    this.longitude = this.longitude + 1;
+  setCoords(currentLatitude, currentLongitude) {
+    this.latitude = currentLatitude;
+    this.longitude = currentLongitude;
   }
 
-  setWeatherData(longitude: string, latitude: string) {
-    getData().then((data: any) => {
-      this.weatherData = data;
+  setWeatherData() {
+    getData(this.latitude, this.longitude).then((data: any) => {
+      this.weatherData = data.dataseries;
     })
   }
 }

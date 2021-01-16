@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
+  Image,
   ScrollView,
   View,
   Text,
@@ -10,15 +11,8 @@ import {
   PermissionsAndroid,
   Platform,
   Button,
+  FlatList,
 } from 'react-native';
-
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
 import Geolocation from '@react-native-community/geolocation';
 import {observer} from 'mobx-react-lite';
@@ -27,92 +21,86 @@ import store from './store/store';
 declare const global: {HermesInternal: null | {}};
 
 const App = observer(() => {
-  const [initialPosition, setInitialPosition]: any = useState('');
-  const [lastPosition, setLastPosition]: any = useState('');
-
-  async function requestLocationPermission() {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: 'Example App',
-          message: 'Example App access to your location ',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('You can use the location');
-        alert('You can use the location');
-      } else {
-        console.log('location permission denied');
-        alert('Location permission denied');
-      }
-    } catch (err) {
-      console.warn(err);
-    }
-  }
+  let watchID: any = null;
+  const [coordsLoading, setCoordsLoading] = useState(false);
+  const [accessToLocationDenied, setAccessToLocationDenied] = useState(false);
+  const [coordsLoadingError, setCoordsLoadingError] = useState('');
 
   useEffect(() => {
+    setCoordsLoading(false);
+  }, [store.weatherData]);
+
+  useEffect(() => {
+    const requestLocationPermission = async () => {
+      if (Platform.OS === 'ios') {
+        getOneTimeLocation();
+      } else {
+        try {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+          );
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            getOneTimeLocation();
+          } else {
+            setAccessToLocationDenied(true);
+          }
+        } catch (err) {
+          console.warn(err);
+        }
+      }
+    };
+
     requestLocationPermission();
+
+    return () => {
+      Geolocation.clearWatch(watchID);
+    };
   }, []);
 
-  function makeRequestLocation() {
-    Geolocation.getCurrentPosition((position) => {
-      const initialPosition = JSON.stringify(position);
-      setInitialPosition(initialPosition);
-    });
-  }
+  const getOneTimeLocation = () => {
+    setCoordsLoading(true);
+    Geolocation.getCurrentPosition(
+      (position) => {
+        const currentLongitude = JSON.stringify(position.coords.longitude);
+        const currentLatitude = JSON.stringify(position.coords.latitude);
+
+        store.setCoords(currentLatitude, currentLongitude);
+        store.setWeatherData();
+      },
+      (error) => {
+        setCoordsLoading(false);
+        setCoordsLoadingError(error.message);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 30000,
+        maximumAge: 100000
+      },
+    );
+  };
 
   return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>See Your Changes</Text>
-          <Text style={styles.sectionDescription}>
-            {store.latitude} {store.longitude}
-          </Text>
-          <TouchableOpacity
-            style={styles.testButton}
-            onPress={() => store.makeChange()}>
-            <Text>Make a change</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.testButton}
-            onPress={() => makeRequestLocation()}>
-            <Text>Make request</Text>
-          </TouchableOpacity>
-          <Text>Position is: {initialPosition}</Text>
-        </View>
-      </SafeAreaView>
-    </>
+    <SafeAreaView>
+      <View>
+        <Text>Latitude: {store.latitude}</Text>
+        <Text>Longitude: {store.longitude}</Text>
+      </View>
+      <FlatList
+        data={store.weatherData}
+        keyExtractor={item => item.timepoint}
+        renderItem={({item}) => (
+          <View>
+            <Text>Timepoint: {item.timepoint}</Text>
+            <Text>Temperature: {item.temp2m}</Text>
+          </View>
+        )}
+      />
+    </SafeAreaView>
   );
 });
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  testButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    backgroundColor: '#ddd',
-    borderRadius: 5,
-    maxWidth: 150,
-    marginVertical: 10,
-  }
+
 });
 
 export default App;
