@@ -1,28 +1,26 @@
 import React, {useState, useEffect} from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
-  Image,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-  TouchableOpacity,
   PermissionsAndroid,
   Platform,
-  Button,
-  FlatList,
+  ScrollView,
+  View,
+  Text
 } from 'react-native';
-
 import Geolocation from '@react-native-community/geolocation';
 import {observer} from 'mobx-react-lite';
 import store from './store/store';
+import { getData } from './api/api.js';
+import {Router, Scene} from 'react-native-router-flux';
 
-declare const global: {HermesInternal: null | {}};
+import {CurrentWeather} from './components/CurrentWeather';
+import {WeatherForWeek} from './components/WeatherForWeek';
+import {LoadingScreen} from './components/LoadingScreen';
+
 
 const App = observer(() => {
   let watchID: any = null;
-  const [coordsLoading, setCoordsLoading] = useState(false);
+  const [coordsLoading, setCoordsLoading] = useState(true);
   const [accessToLocationDenied, setAccessToLocationDenied] = useState(false);
   const [coordsLoadingError, setCoordsLoadingError] = useState('');
 
@@ -65,7 +63,10 @@ const App = observer(() => {
         const currentLatitude = JSON.stringify(position.coords.latitude);
 
         store.setCoords(currentLatitude, currentLongitude);
-        store.setWeatherData();
+        getData(store.latitude, store.longitude)
+          .then(data => {
+            store.setWeatherData(data.dataseries);
+          })
       },
       (error) => {
         setCoordsLoading(false);
@@ -80,27 +81,18 @@ const App = observer(() => {
   };
 
   return (
-    <SafeAreaView>
-      <View>
-        <Text>Latitude: {store.latitude}</Text>
-        <Text>Longitude: {store.longitude}</Text>
-      </View>
-      <FlatList
-        data={store.weatherData}
-        keyExtractor={item => item.timepoint}
-        renderItem={({item}) => (
-          <View>
-            <Text>Timepoint: {item.timepoint}</Text>
-            <Text>Temperature: {item.temp2m}</Text>
-          </View>
-        )}
-      />
-    </SafeAreaView>
+    <View style={styles.body}>
+      {coordsLoading && <LoadingScreen />}
+
+      {store.weatherData.length > 0 && <CurrentWeather />}
+    </View>
   );
 });
 
 const styles = StyleSheet.create({
-
+  body: {
+    flex: 1
+  }
 });
 
 export default App;

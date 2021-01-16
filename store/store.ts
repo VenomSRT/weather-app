@@ -1,24 +1,21 @@
-import {makeAutoObservable} from 'mobx';
-import { getData } from './api/api.js';
+import {makeAutoObservable, runInAction} from 'mobx';
 
 class Store {
   weatherData = [];
-  latitude = '';
-  longitude = '';
+  latitude: string = '';
+  longitude: string = '';
 
-  constructor() {
+  constructor(){
     makeAutoObservable(this)
   }
 
-  setCoords(currentLatitude, currentLongitude) {
+  setCoords(currentLatitude: string, currentLongitude: string): void {
     this.latitude = currentLatitude;
     this.longitude = currentLongitude;
   }
 
-  setWeatherData() {
-    getData(this.latitude, this.longitude).then((data: any) => {
-      this.weatherData = data.dataseries;
-    })
+  setWeatherData(data: []) {
+    this.weatherData = data;
   }
 }
 
