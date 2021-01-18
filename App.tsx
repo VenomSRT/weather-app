@@ -19,9 +19,12 @@ import {WeatherForWeek} from './components/WeatherForWeek';
 
 const App = observer(() => {
   let watchID: any = null;
-  const [coordsLoading, setCoordsLoading] = useState(true);
   const [accessToLocationDenied, setAccessToLocationDenied] = useState(false);
   const [coordsLoadingError, setCoordsLoadingError] = useState('');
+
+  useEffect(() => {
+    store.setLoadingState(false);
+  }, [store.weatherData])
 
   useEffect(() => {
     const requestLocationPermission = async () => {
@@ -58,6 +61,7 @@ const App = observer(() => {
         const currentLatitude = JSON.stringify(position.coords.latitude);
 
         store.setCoords(currentLatitude, currentLongitude);
+        store.setLoadingState(true);
         getData(currentLatitude, currentLongitude)
           .then(data => {
             store.setWeatherData(data.dataseries);
@@ -97,7 +101,7 @@ const App = observer(() => {
       <Scene key="root">
         <Scene
           key="current"
-          component={() => <CurrentWeather/>}
+          component={CurrentWeather}
           title="Current weather"
           initial
         />

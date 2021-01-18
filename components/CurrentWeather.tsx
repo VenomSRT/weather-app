@@ -46,72 +46,71 @@ export const CurrentWeather = observer(() => {
 
   return (
     <View style={styles.body}>
-      {/* {store.loadingState && <LoadingScreen />} */}
+      <View>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => Actions.week()}>
+          <Text style={styles.button_text}>
+            Watch forecast for a next 7 days
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-      {store.weatherData.length > 0 && (
-        <>
+      {store.loadingState && <LoadingScreen />}
+
+      {store.weatherData.length > 0 && !store.loadingState && (
+        <View style={styles.data_container}>
+          <View style={styles.image_container}>
+            <Image
+              style={styles.weather_image}
+              source={imagesLinks[currentWeather.weather]}
+            />
+
+            {currentWeather.wind10m.speed > 5 && (
+              <Image style={styles.weather_image} source={imagesLinks.wind} />
+            )}
+          </View>
           <View>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => Actions.week()}>
-              <Text style={styles.button_text}>
-                Watch forecast for a next 7 days
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.data_container}>
-            <View style={styles.image_container}>
-              <Image
-                style={styles.weather_image}
-                source={imagesLinks[currentWeather.weather]}
-              />
-
-              {currentWeather.wind10m.speed > 5 && (
-                <Image style={styles.weather_image} source={imagesLinks.wind} />
-              )}
+            <View style={styles.description_block}>
+              <Text style={styles.weather_info}>Temperature:</Text>
+              <Text style={styles.weather_info}>{currentWeather.temp2m}C</Text>
             </View>
-            <View>
-              <View style={styles.description_block}>
-                <Text style={styles.weather_info}>Temperature:</Text>
-                <Text style={styles.weather_info}>{currentWeather.temp2m}C</Text>
-              </View>
 
-              <View style={styles.description_block}>
-                <Text style={styles.weather_info}>Cloud cover:</Text>
-                <Text style={styles.weather_info}>{cloudCover[currentWeather.cloudcover]}</Text>              
-              </View>
-
-              <View style={styles.description_block}>
-                <Text style={styles.weather_info}>Humidity:</Text>
-                <Text style={styles.weather_info}>{currentWeather.rh2m}</Text>
-              </View>
-
-              <View style={styles.description_block}>
-                <Text style={styles.weather_info}>Precipitation:</Text>
-                <Text style={styles.weather_info}>{precipitation[currentWeather.prec_amount]}</Text>              
-              </View>
-
-              <View style={styles.description_block}>
-                <Text style={styles.weather_info}>Wind:</Text>
-                <Text style={styles.weather_info}>{windSpeed[currentWeather.wind10m.speed]}</Text>              
-              </View>  
+            <View style={styles.description_block}>
+              <Text style={styles.weather_info}>Cloud cover:</Text>
+              <Text style={styles.weather_info}>{cloudCover[currentWeather.cloudcover]}</Text>              
             </View>
-          </View>
 
-          <View>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => {
-                getData(store.latitude, store.longitude).then((data) => {
-                  store.setWeatherData(data.dataseries);
-                });
-              }}>
-              <Text style={styles.button_text}>Update data</Text>
-            </TouchableOpacity>
+            <View style={styles.description_block}>
+              <Text style={styles.weather_info}>Humidity:</Text>
+              <Text style={styles.weather_info}>{currentWeather.rh2m}</Text>
+            </View>
+
+            <View style={styles.description_block}>
+              <Text style={styles.weather_info}>Precipitation:</Text>
+              <Text style={styles.weather_info}>{precipitation[currentWeather.prec_amount]}</Text>              
+            </View>
+
+            <View style={styles.description_block}>
+              <Text style={styles.weather_info}>Wind:</Text>
+              <Text style={styles.weather_info}>{windSpeed[currentWeather.wind10m.speed]}</Text>              
+            </View>  
           </View>
-        </>
+        </View>
       )}
+
+      <View>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            store.setLoadingState(true);
+            getData(store.latitude, store.longitude).then((data) => {
+              store.setWeatherData(data.dataseries);
+            });
+          }}>
+          <Text style={styles.button_text}>Update data</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 });
