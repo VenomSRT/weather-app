@@ -1,9 +1,10 @@
-import {makeAutoObservable, runInAction} from 'mobx';
+import {makeAutoObservable} from 'mobx';
 
 class Store {
   weatherData = [];
   latitude: string = '';
   longitude: string = '';
+  loadingState: boolean = false;
 
   constructor(){
     makeAutoObservable(this)
@@ -16,6 +17,10 @@ class Store {
 
   setWeatherData(data: []) {
     this.weatherData = data;
+  }
+
+  setLoadingState(state: boolean) {
+    this.loadingState = state;
   }
 }
 

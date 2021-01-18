@@ -8,14 +8,13 @@ import {
   Text
 } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
+import {Router, Scene} from 'react-native-router-flux';
 import {observer} from 'mobx-react-lite';
 import store from './store/store';
 import { getData } from './api/api.js';
-import {Router, Scene} from 'react-native-router-flux';
 
 import {CurrentWeather} from './components/CurrentWeather';
 import {WeatherForWeek} from './components/WeatherForWeek';
-import {LoadingScreen} from './components/LoadingScreen';
 
 
 const App = observer(() => {
@@ -23,10 +22,6 @@ const App = observer(() => {
   const [coordsLoading, setCoordsLoading] = useState(true);
   const [accessToLocationDenied, setAccessToLocationDenied] = useState(false);
   const [coordsLoadingError, setCoordsLoadingError] = useState('');
-
-  useEffect(() => {
-    setCoordsLoading(false);
-  }, [store.weatherData]);
 
   useEffect(() => {
     const requestLocationPermission = async () => {
@@ -39,6 +34,7 @@ const App = observer(() => {
           );
           if (granted === PermissionsAndroid.RESULTS.GRANTED) {
             getOneTimeLocation();
+            subscribeLocationLocation();
           } else {
             setAccessToLocationDenied(true);
           }
@@ -56,36 +52,63 @@ const App = observer(() => {
   }, []);
 
   const getOneTimeLocation = () => {
-    setCoordsLoading(true);
     Geolocation.getCurrentPosition(
       (position) => {
         const currentLongitude = JSON.stringify(position.coords.longitude);
         const currentLatitude = JSON.stringify(position.coords.latitude);
 
         store.setCoords(currentLatitude, currentLongitude);
-        getData(store.latitude, store.longitude)
+        getData(currentLatitude, currentLongitude)
           .then(data => {
             store.setWeatherData(data.dataseries);
           })
       },
       (error) => {
-        setCoordsLoading(false);
         setCoordsLoadingError(error.message);
       },
       {
-        enableHighAccuracy: true,
-        timeout: 30000,
-        maximumAge: 100000
+        enableHighAccuracy: false,
+        timeout: 20000,
+        maximumAge: 1000
+      },
+    );
+  };
+
+  const subscribeLocationLocation = () => {
+    watchID = Geolocation.watchPosition(
+      (position) => {
+        const currentLongitude = JSON.stringify(position.coords.longitude);
+        const currentLatitude = JSON.stringify(position.coords.latitude);
+
+        store.setCoords(currentLatitude, currentLongitude);
+      },
+      (error) => {
+        setCoordsLoadingError(error.message);
+      },
+      {
+        enableHighAccuracy: false,
+        maximumAge: 1000
       },
     );
   };
 
   return (
-    <View style={styles.body}>
-      {coordsLoading && <LoadingScreen />}
+    <Router>
+      <Scene key="root">
+        <Scene
+          key="current"
+          component={() => <CurrentWeather/>}
+          title="Current weather"
+          initial
+        />
 
-      {store.weatherData.length > 0 && <CurrentWeather />}
-    </View>
+        <Scene
+          key="week"
+          component={WeatherForWeek}
+          title="Forecast for a week"
+        />
+      </Scene>
+    </Router>
   );
 });
 
