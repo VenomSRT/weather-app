@@ -5,7 +5,8 @@ import {
   Platform,
   ScrollView,
   View,
-  Text
+  Text,
+  SafeAreaView
 } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import {Router, Scene} from 'react-native-router-flux';
@@ -65,6 +66,7 @@ const App = observer(() => {
         getData(currentLatitude, currentLongitude)
           .then(data => {
             store.setWeatherData(data.dataseries);
+            store.setDataTimeStamp(data.init);
           })
       },
       (error) => {

@@ -1,7 +1,8 @@
 import {makeAutoObservable} from 'mobx';
 
 class Store {
-  weatherData = [];
+  weatherData: any = [];
+  timeStamp: string = '';
   latitude: string = '';
   longitude: string = '';
   loadingState: boolean = false;
@@ -15,11 +16,15 @@ class Store {
     this.longitude = currentLongitude;
   }
 
-  setWeatherData(data: []) {
+  setWeatherData(data: []): void {
     this.weatherData = data;
   }
 
-  setLoadingState(state: boolean) {
+  setDataTimeStamp(date: string): void {
+    this.timeStamp = date;
+  }
+
+  setLoadingState(state: boolean): void {
     this.loadingState = state;
   }
 }

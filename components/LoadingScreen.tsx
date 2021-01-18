@@ -13,7 +13,6 @@ export const LoadingScreen = () => {
 
 const styles = StyleSheet.create({
   body: {
-    backgroundColor: 'rgba(242, 242, 242, 0.9)',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
