@@ -23,6 +23,18 @@ export const CurrentWeather = observer(() => {
 
       {store.loadingState && <LoadingScreen />}
 
+      {store.permissionDenied && (
+        <View style={styles.error_container}>
+          <Text>Allow location access to this app and reload</Text>
+        </View>
+      )}
+
+      {store.errorStatus && (
+        <View style={styles.error_container}>
+          <Text>{store.errorMessage}</Text>
+        </View>
+      )}
+
       {currentWeather && !store.loadingState && (
         <View style={styles.data_container}>
           <View>
@@ -124,5 +136,9 @@ const styles = StyleSheet.create({
   weather_image: {
     width: 130,
     height: 130,
+  },
+  error_container: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

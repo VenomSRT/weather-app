@@ -10,8 +10,6 @@ import {WeatherForWeek} from './components/WeatherForWeek';
 
 const App = observer(() => {
   let watchID: any = null;
-  const [accessToLocationDenied, setAccessToLocationDenied] = useState(false);
-  const [coordsLoadingError, setCoordsLoadingError] = useState('');
 
   useEffect(() => {
     store.setLoadingState(false);
@@ -30,10 +28,10 @@ const App = observer(() => {
             getOneTimeLocation();
             subscribeLocation();
           } else {
-            setAccessToLocationDenied(true);
+            store.setPermissionDenied(true);
           }
-        } catch (err) {
-          console.warn(err);
+        } catch (error) {
+          store.setError(error);
         }
       }
     };
@@ -46,17 +44,19 @@ const App = observer(() => {
   }, []);
 
   const getOneTimeLocation = () => {
+    store.setLoadingState(true);
+
     Geolocation.getCurrentPosition(
       (position) => {
         const currentLongitude = JSON.stringify(position.coords.longitude);
         const currentLatitude = JSON.stringify(position.coords.latitude);
 
         store.setCoords(currentLatitude, currentLongitude);
-        store.setLoadingState(true);
+
         store.setWeatherData();
       },
       (error) => {
-        setCoordsLoadingError(error.message);
+        store.setError(error);
       },
       {
         enableHighAccuracy: false,
@@ -75,7 +75,7 @@ const App = observer(() => {
         store.setCoords(currentLatitude, currentLongitude);
       },
       (error) => {
-        setCoordsLoadingError(error.message);
+        store.setError(error);
       },
       {
         enableHighAccuracy: false,

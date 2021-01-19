@@ -30,9 +30,21 @@ class Store {
   latitude: string = '';
   longitude: string = '';
   loadingState: boolean = false;
+  errorStatus: boolean = false;
+  errorMessage: string = '';
+  permissionDenied: boolean = false;
 
   constructor() {
     makeAutoObservable(this);
+  }
+
+  setPermissionDenied(state: boolean) {
+    this.permissionDenied = state;
+  }
+
+  setError(error: any) {
+    this.errorStatus = true;
+    this.errorMessage = error.message;
   }
 
   setCoords(currentLatitude: string, currentLongitude: string): void {
@@ -46,6 +58,10 @@ class Store {
         this.weatherData = data.dataseries;
         this.timeStamp = data.init;
         this.currentDate = dateConverter(this.timeStamp);
+      }),
+      action('FAIL', (error: any) => {
+        this.setError(error);
+        this.loadingState = false;
       }),
     );
   }

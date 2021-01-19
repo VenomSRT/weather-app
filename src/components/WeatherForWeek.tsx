@@ -15,13 +15,14 @@ export const WeatherForWeek = observer(() => {
   return (
     <View>
       <FlatList
+        style={{paddingTop: 20}}
         data={weekData}
         keyExtractor={(item) => String(item.timepoint)}
         renderItem={({item}) => (
           <View style={styles.main_container}>
             <View style={styles.data_container}>
               <View>
-                <Text>{item.weatherDate}</Text>
+                <Text style={styles.weather_info}>{item.weatherDate}</Text>
               </View>
               <View style={styles.image_container}>
                 <Image source={imagesLinks[item.weather]} />
