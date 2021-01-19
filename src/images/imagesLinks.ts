@@ -28,4 +28,4 @@ export const imagesLinks: any = {
   tsrainday: require('./about_civil_tsrainday.png'),
   tsrainnight: require('./about_civil_tsrainnight.png'),
   wind: require('./about_civil_windy.png'),
-}
+};

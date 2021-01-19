@@ -13,7 +13,7 @@ const App = observer(() => {
 
   useEffect(() => {
     store.setLoadingState(false);
-  }, [store.weatherData]);
+  });
 
   useEffect(() => {
     const requestLocationPermission = async () => {
@@ -41,7 +41,7 @@ const App = observer(() => {
     return () => {
       Geolocation.clearWatch(watchID);
     };
-  }, []);
+  });
 
   const getOneTimeLocation = () => {
     store.setLoadingState(true);

@@ -7,7 +7,7 @@ export const cloudCover: any = {
   6: '56%-69%',
   7: '69%-81%',
   8: '81%-94%',
-  9: '94%-100%'
+  9: '94%-100%',
 };
 
 export const windSpeed: any = {
@@ -18,7 +18,7 @@ export const windSpeed: any = {
   5: '10.8-17.2m/s (strong)',
   6: '17.2-24.5m/s (gale)',
   7: '24.5-32.6m/s (storm)',
-  8: 'Over 32.6m/s (hurricane)'
+  8: 'Over 32.6m/s (hurricane)',
 };
 
 export const precipitation: any = {
@@ -31,5 +31,5 @@ export const precipitation: any = {
   6: '16-30mm/hr',
   7: '30-50mm/hr',
   8: '50-75mm/hr',
-  9: 'Over 75mm/hr'
-}
+  9: 'Over 75mm/hr',
+};

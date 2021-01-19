@@ -6,8 +6,10 @@ const units = 'metric';
 const output = 'json';
 const timezoneAdjustment = 0;
 
-export function getData(latitude, longitude) {  
-  return axios.get(`${BASE_URL}?lon=${longitude}&lat=${latitude}&ac=${altitudeCorrection}&unit=${units}&output=${output}&tzshift=${timezoneAdjustment}`)
-    .then(response => response.data)
+export function getData(latitude, longitude) {
+  return axios
+    .get(
+      `${BASE_URL}?lon=${longitude}&lat=${latitude}&ac=${altitudeCorrection}&unit=${units}&output=${output}&tzshift=${timezoneAdjustment}`,
+    )
+    .then((response) => response.data);
 }
-
