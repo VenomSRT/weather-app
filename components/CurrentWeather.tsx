@@ -1,22 +1,20 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
 import {observer} from 'mobx-react-lite';
 import {Actions} from 'react-native-router-flux';
-import {getData} from '../api/api';
 import {LoadingScreen} from './LoadingScreen';
 import store from '../store/store';
 import {imagesLinks} from '../images/imagesLinks';
 import {cloudCover, precipitation, windSpeed} from '../store/valuesDefinition';
 
 export const CurrentWeather = observer(() => {
-  const currentWeather: any = store.weatherData[0];
-  
+  const currentWeather: any =
+    store.weatherData.length > 0 ? store.weatherData[0] : null;
+
   return (
     <View style={styles.body}>
       <View>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => Actions.week()}>
+        <TouchableOpacity style={styles.button} onPress={() => Actions.week()}>
           <Text style={styles.button_text}>
             Watch forecast for a next 7 days
           </Text>
@@ -25,8 +23,11 @@ export const CurrentWeather = observer(() => {
 
       {store.loadingState && <LoadingScreen />}
 
-      {store.weatherData.length > 0 && !store.loadingState && (
+      {currentWeather && !store.loadingState && (
         <View style={styles.data_container}>
+          <View>
+            <Text style={styles.date}>{store.currentDate}</Text>
+          </View>
           <View style={styles.image_container}>
             <Image
               style={styles.weather_image}
@@ -45,7 +46,9 @@ export const CurrentWeather = observer(() => {
 
             <View style={styles.description_block}>
               <Text style={styles.weather_info}>Cloud cover:</Text>
-              <Text style={styles.weather_info}>{cloudCover[currentWeather.cloudcover]}</Text>              
+              <Text style={styles.weather_info}>
+                {cloudCover[currentWeather.cloudcover]}
+              </Text>
             </View>
 
             <View style={styles.description_block}>
@@ -54,14 +57,19 @@ export const CurrentWeather = observer(() => {
             </View>
 
             <View style={styles.description_block}>
-              <Text style={styles.weather_info}>Precipitation:</Text>
-              <Text style={styles.weather_info}>{precipitation[currentWeather.prec_amount]}</Text>              
+              <Text style={styles.weather_info}>Precipitation: </Text>
+              <Text style={styles.weather_info}>
+                {precipitation[currentWeather.prec_amount]}
+              </Text>
             </View>
 
             <View style={styles.description_block}>
               <Text style={styles.weather_info}>Wind: </Text>
-              <Text style={styles.weather_info}>{windSpeed[currentWeather.wind10m.speed]} {currentWeather.wind10m.direction}</Text>              
-            </View>  
+              <Text style={styles.weather_info}>
+                {windSpeed[currentWeather.wind10m.speed]}{' '}
+                {currentWeather.wind10m.direction}
+              </Text>
+            </View>
           </View>
         </View>
       )}
@@ -71,10 +79,7 @@ export const CurrentWeather = observer(() => {
           style={styles.button}
           onPress={() => {
             store.setLoadingState(true);
-            getData(store.latitude, store.longitude).then((data) => {
-              store.setWeatherData(data.dataseries);
-              store.setDataTimeStamp(data.init);
-            });
+            store.setWeatherData();
           }}>
           <Text style={styles.button_text}>Update data</Text>
         </TouchableOpacity>
@@ -100,10 +105,13 @@ const styles = StyleSheet.create({
   data_container: {
     alignItems: 'center',
   },
+  date: {
+    fontSize: 20,
+  },
   image_container: {
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingBottom: 50,
+    paddingVertical: 40,
   },
   description_block: {
     flexDirection: 'row',

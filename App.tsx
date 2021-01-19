@@ -1,22 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {
-  StyleSheet,
-  PermissionsAndroid,
-  Platform,
-  ScrollView,
-  View,
-  Text,
-  SafeAreaView
-} from 'react-native';
+import {PermissionsAndroid, Platform} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import {Router, Scene} from 'react-native-router-flux';
 import {observer} from 'mobx-react-lite';
 import store from './store/store';
-import { getData } from './api/api.js';
 
 import {CurrentWeather} from './components/CurrentWeather';
 import {WeatherForWeek} from './components/WeatherForWeek';
-
 
 const App = observer(() => {
   let watchID: any = null;
@@ -25,7 +15,7 @@ const App = observer(() => {
 
   useEffect(() => {
     store.setLoadingState(false);
-  }, [store.weatherData])
+  }, [store.weatherData]);
 
   useEffect(() => {
     const requestLocationPermission = async () => {
@@ -34,11 +24,11 @@ const App = observer(() => {
       } else {
         try {
           const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           );
           if (granted === PermissionsAndroid.RESULTS.GRANTED) {
             getOneTimeLocation();
-            subscribeLocationLocation();
+            subscribeLocation();
           } else {
             setAccessToLocationDenied(true);
           }
@@ -63,11 +53,7 @@ const App = observer(() => {
 
         store.setCoords(currentLatitude, currentLongitude);
         store.setLoadingState(true);
-        getData(currentLatitude, currentLongitude)
-          .then(data => {
-            store.setWeatherData(data.dataseries);
-            store.setDataTimeStamp(data.init);
-          })
+        store.setWeatherData();
       },
       (error) => {
         setCoordsLoadingError(error.message);
@@ -75,12 +61,12 @@ const App = observer(() => {
       {
         enableHighAccuracy: false,
         timeout: 20000,
-        maximumAge: 1000
+        maximumAge: 1000,
       },
     );
   };
 
-  const subscribeLocationLocation = () => {
+  const subscribeLocation = () => {
     watchID = Geolocation.watchPosition(
       (position) => {
         const currentLongitude = JSON.stringify(position.coords.longitude);
@@ -93,7 +79,7 @@ const App = observer(() => {
       },
       {
         enableHighAccuracy: false,
-        maximumAge: 1000
+        maximumAge: 1000,
       },
     );
   };
@@ -116,12 +102,6 @@ const App = observer(() => {
       </Scene>
     </Router>
   );
-});
-
-const styles = StyleSheet.create({
-  body: {
-    flex: 1
-  }
 });
 
 export default App;
