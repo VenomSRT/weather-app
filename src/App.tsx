@@ -12,10 +12,6 @@ const App = observer(() => {
   let watchID: any = null;
 
   useEffect(() => {
-    store.setLoadingState(false);
-  }, [store.weatherData]);
-
-  useEffect(() => {
     const requestLocationPermission = async () => {
       if (Platform.OS === 'ios') {
         getOneTimeLocation();

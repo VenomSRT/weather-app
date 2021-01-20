@@ -23,8 +23,8 @@ interface sortedWeather extends weatherData {
 }
 
 class Store {
-  weatherData: weatherData[] | [] = [];
-  weatherForWeek: sortedWeather[] | [] = [];
+  weatherData: weatherData[] = [];
+  weatherForWeek: sortedWeather[] = [];
   timeStamp: string = '';
   currentDate: string = '';
   latitude: string = '';
@@ -58,6 +58,7 @@ class Store {
         this.weatherData = data.dataseries;
         this.timeStamp = data.init;
         this.currentDate = dateConverter(this.timeStamp);
+        this.loadingState = false;
       }),
       action('FAIL', (error: any) => {
         this.setError(error);
@@ -75,23 +76,21 @@ class Store {
   }
 
   setWeatherForSevenDays(): void {
-    let sortedData: weatherData[] | [] = [];
+    let sortedData: sortedWeather[] = [];
     const nextDay: number = 36 - +this.timeStamp.substring(8);
 
-    if (this.weatherData.length > 0) {
-      for (let i = 0; i < 7; i++) {
-        sortedData.push(
-          this.weatherData.find((elem) => elem.timepoint === nextDay + i * 24),
-        );
+    for (let i = 0; i < 7; i++) {
+      const foundedDay = this.weatherData.find(
+        (elem) => elem.timepoint === nextDay + i * 24,
+      );
+
+      if (foundedDay) {
+        sortedData.push({
+          ...foundedDay,
+          weatherDate: dateConverter(this.timeStamp, foundedDay.timepoint),
+        });
       }
     }
-
-    sortedData = sortedData.map(
-      (data: weatherData): sortedWeather => ({
-        ...data,
-        weatherDate: dateConverter(this.timeStamp, data.timepoint),
-      }),
-    );
 
     this.weatherForWeek = sortedData;
   }
