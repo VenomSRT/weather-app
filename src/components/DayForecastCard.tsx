@@ -4,7 +4,25 @@ import {observer} from 'mobx-react-lite';
 import {imagesLinks} from '../images/imagesLinks';
 import {cloudCover, precipitation, windSpeed} from '../store/valuesDefinition';
 
-export const DayForecastCard = observer(({dailyWeather}) => {
+interface IdailyWeather {
+  timepoint: number;
+  cloudcover: number;
+  lifted_index: number;
+  prec_type: string;
+  prec_amount: number;
+  temp2m: number;
+  rh2m: string;
+  wind10m: Wind10m;
+  weather: string;
+  weatherDate: string;
+}
+
+interface Wind10m {
+  direction: string;
+  speed: number;
+}
+
+export const DayForecastCard = observer(({dailyWeather}: IdailyWeather) => {
   return (
     <>
       <View>

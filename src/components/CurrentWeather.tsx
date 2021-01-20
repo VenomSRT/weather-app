@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
   },
   data_container: {
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   error_container: {
     justifyContent: 'center',
