@@ -1,4 +1,6 @@
 import {makeAutoObservable, action} from 'mobx';
+import {PermissionsAndroid, Platform} from 'react-native';
+import Geolocation from '@react-native-community/geolocation';
 import {getData} from '../api/api';
 
 interface weatherData {
@@ -32,27 +34,76 @@ class Store {
   loadingState: boolean = false;
   errorStatus: boolean = false;
   errorMessage: string = '';
-  permissionDenied: boolean = false;
 
   constructor() {
     makeAutoObservable(this);
   }
 
-  setPermissionDenied(state: boolean) {
-    this.permissionDenied = state;
+  async requestLocationPermission(watchID: any) {
+    if (Platform.OS === 'ios') {
+      this.getOneTimeLocation();
+    } else {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          this.getOneTimeLocation();
+          this.subscribeLocation(watchID);
+        } else {
+          this.setError(undefined, true);
+        }
+      } catch (error) {
+        this.setError(error, true);
+      }
+    }
   }
 
-  setError(error: any) {
-    this.errorStatus = true;
+  getOneTimeLocation() {
+    this.loadingState = true;
+
+    Geolocation.getCurrentPosition(
+      (position) => {
+        this.longitude = JSON.stringify(position.coords.longitude);
+        this.latitude = JSON.stringify(position.coords.latitude);
+
+        this.setWeatherData();
+      },
+      (error) => {
+        this.setError(error, true);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 20000,
+        maximumAge: 1000,
+      },
+    );
+  }
+
+  subscribeLocation(watchID: any) {
+    watchID = Geolocation.watchPosition(
+      (position) => {
+        this.longitude = JSON.stringify(position.coords.longitude);
+        this.latitude = JSON.stringify(position.coords.latitude);
+      },
+      (error) => {
+        this.setError(error, true);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 1000,
+      },
+    );
+  }
+
+  setError(error: any = {message: ''}, status: boolean) {
+    this.loadingState = false;
+    this.errorStatus = status;
     this.errorMessage = error.message;
   }
 
-  setCoords(currentLatitude: string, currentLongitude: string): void {
-    this.latitude = currentLatitude;
-    this.longitude = currentLongitude;
-  }
-
   setWeatherData(): void {
+    this.setError(undefined, false);
     this.loadingState = true;
 
     getData(this.latitude, this.longitude).then(
@@ -63,7 +114,7 @@ class Store {
         this.loadingState = false;
       }),
       action('FAIL', (error: any) => {
-        this.setError(error);
+        this.setError(error, true);
         this.loadingState = false;
       }),
     );

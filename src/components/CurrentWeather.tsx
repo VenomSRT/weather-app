@@ -23,15 +23,11 @@ export const CurrentWeather = observer(() => {
 
       {store.loadingState && <LoadingScreen />}
 
-      {store.permissionDenied && (
-        <View style={styles.error_container}>
-          <Text>Allow location access to this app and reload</Text>
-        </View>
-      )}
-
       {store.errorStatus && (
         <View style={styles.error_container}>
-          <Text>{store.errorMessage}</Text>
+          <Text>
+            {store.errorMessage || 'Allow location access to this app'}
+          </Text>
         </View>
       )}
 

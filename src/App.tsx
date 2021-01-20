@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import {PermissionsAndroid, Platform} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import {Router, Scene} from 'react-native-router-flux';
 import {observer} from 'mobx-react-lite';
@@ -12,71 +11,12 @@ const App = observer(() => {
   let watchID: any = null;
 
   useEffect(() => {
-    const requestLocationPermission = async () => {
-      if (Platform.OS === 'ios') {
-        getOneTimeLocation();
-      } else {
-        try {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          );
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            getOneTimeLocation();
-            subscribeLocation();
-          } else {
-            store.setPermissionDenied(true);
-          }
-        } catch (error) {
-          store.setError(error);
-        }
-      }
-    };
-
-    requestLocationPermission();
+    store.requestLocationPermission(watchID);
 
     return () => {
       Geolocation.clearWatch(watchID);
     };
   }, []);
-
-  const getOneTimeLocation = () => {
-    Geolocation.getCurrentPosition(
-      (position) => {
-        const currentLongitude = JSON.stringify(position.coords.longitude);
-        const currentLatitude = JSON.stringify(position.coords.latitude);
-
-        store.setCoords(currentLatitude, currentLongitude);
-
-        store.setWeatherData();
-      },
-      (error) => {
-        store.setError(error);
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 20000,
-        maximumAge: 1000,
-      },
-    );
-  };
-
-  const subscribeLocation = () => {
-    watchID = Geolocation.watchPosition(
-      (position) => {
-        const currentLongitude = JSON.stringify(position.coords.longitude);
-        const currentLatitude = JSON.stringify(position.coords.latitude);
-
-        store.setCoords(currentLatitude, currentLongitude);
-      },
-      (error) => {
-        store.setError(error);
-      },
-      {
-        enableHighAccuracy: false,
-        maximumAge: 1000,
-      },
-    );
-  };
 
   return (
     <Router>
