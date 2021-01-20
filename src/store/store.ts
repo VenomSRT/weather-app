@@ -78,14 +78,14 @@ class Store {
     const nextDay: number = 36 - +this.timeStamp.substring(8);
 
     for (let i = 0; i < 7; i++) {
-      const foundedDay = this.weatherData.find(
+      const findedDay = this.weatherData.find(
         (elem) => elem.timepoint === nextDay + i * 24,
       );
 
-      if (foundedDay) {
+      if (findedDay) {
         sortedData.push({
-          ...foundedDay,
-          weatherDate: dateConverter(this.timeStamp, foundedDay.timepoint),
+          ...findedDay,
+          weatherDate: dateConverter(this.timeStamp, findedDay.timepoint),
         });
       }
     }
