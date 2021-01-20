@@ -89,10 +89,7 @@ export const CurrentWeather = observer(() => {
       <View>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => {
-            store.setLoadingState(true);
-            store.setWeatherData();
-          }}>
+          onPress={() => store.setWeatherData()}>
           <Text style={styles.button_text}>Update data</Text>
         </TouchableOpacity>
       </View>

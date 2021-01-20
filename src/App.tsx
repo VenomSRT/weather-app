@@ -40,8 +40,6 @@ const App = observer(() => {
   }, []);
 
   const getOneTimeLocation = () => {
-    store.setLoadingState(true);
-
     Geolocation.getCurrentPosition(
       (position) => {
         const currentLongitude = JSON.stringify(position.coords.longitude);

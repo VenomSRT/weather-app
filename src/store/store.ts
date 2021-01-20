@@ -53,6 +53,8 @@ class Store {
   }
 
   setWeatherData(): void {
+    this.loadingState = true;
+
     getData(this.latitude, this.longitude).then(
       action('OK', (data: any) => {
         this.weatherData = data.dataseries;
@@ -69,10 +71,6 @@ class Store {
 
   setDataTimeStamp(date: string): void {
     this.timeStamp = date;
-  }
-
-  setLoadingState(state: boolean): void {
-    this.loadingState = state;
   }
 
   setWeatherForSevenDays(): void {
