@@ -10,9 +10,16 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@react-native-community/geolocation": "^2.0.2",
+    "axios": "^0.21.1",
     "mobx": "^6.0.4",
+    "mobx-react-lite": "^3.1.6",
     "react": "16.13.1",
-    "react-native": "0.63.4"
+    "react-native": "0.63.4",
+    "react-native-gesture-handler": "^1.9.0",
+    "react-native-reanimated": "^1.13.2",
+    "react-native-router-flux": "^4.2.0",
+    "react-native-screens": "^2.16.1"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
