@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {View, Text, Image, FlatList, StyleSheet} from 'react-native';
+import {View, FlatList, StyleSheet} from 'react-native';
 import {observer} from 'mobx-react-lite';
 import store from '../store/store';
 import {DayForecastCard} from './DayForecastCard';
@@ -20,7 +20,10 @@ export const WeatherForWeek = observer(() => {
         renderItem={({item}) => (
           <View style={styles.main_container}>
             <View style={styles.data_container}>
-              <DayForecastCard dailyWeather={item} />
+              <DayForecastCard
+                dailyWeather={item}
+                fontStyles={styles.weather_info}
+              />
             </View>
           </View>
         )}
@@ -45,9 +48,8 @@ const styles = StyleSheet.create({
     borderColor: '#0092d6',
     borderRadius: 10,
   },
-  image_container: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingVertical: 20,
+  weather_info: {
+    fontSize: 17,
+    paddingVertical: 5,
   },
 });

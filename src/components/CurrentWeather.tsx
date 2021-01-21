@@ -7,6 +7,7 @@ import store from '../store/store';
 import {DayForecastCard} from './DayForecastCard';
 
 export const CurrentWeather = observer(() => {
+  const currentDate = store.currentDate;
   const currentWeather: any =
     store.weatherData.length > 0 ? store.weatherData[0] : null;
 
@@ -32,7 +33,10 @@ export const CurrentWeather = observer(() => {
 
       {currentWeather && !store.loadingState && (
         <View style={styles.data_container}>
-          <DayForecastCard dailyWeather={currentWeather} />
+          <DayForecastCard
+            dailyWeather={{...currentWeather, weatherDate: currentDate}}
+            fontStyles={styles.weather_info}
+          />
         </View>
       )}
 
@@ -68,5 +72,9 @@ const styles = StyleSheet.create({
   error_container: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  weather_info: {
+    fontSize: 25,
+    paddingVertical: 8,
   },
 });

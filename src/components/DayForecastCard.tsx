@@ -1,8 +1,13 @@
 import React from 'react';
-import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Text, Image, StyleSheet} from 'react-native';
 import {observer} from 'mobx-react-lite';
 import {imagesLinks} from '../images/imagesLinks';
 import {cloudCover, precipitation, windSpeed} from '../store/valuesDefinition';
+
+interface CardProps {
+  dailyWeather: IdailyWeather;
+  fontStyles: {fontSize: number; paddingVertical: number};
+}
 
 interface IdailyWeather {
   timepoint: number;
@@ -22,72 +27,73 @@ interface Wind10m {
   speed: number;
 }
 
-export const DayForecastCard = observer(({dailyWeather}: IdailyWeather) => {
-  return (
-    <>
-      <View>
-        <Text style={styles.weather_info}>{dailyWeather.weatherDate}</Text>
-      </View>
-      <View style={styles.image_container}>
-        <Image
-          style={styles.image}
-          source={imagesLinks[dailyWeather.weather]}
-        />
-
-        {dailyWeather.wind10m.speed > 5 && <Image source={imagesLinks.wind} />}
-      </View>
-      <View style={styles.descriptions_container}>
-        <View style={styles.description_block}>
-          <Text style={styles.weather_info}>Temperature:</Text>
-          <Text style={styles.weather_info}>{dailyWeather.temp2m}C</Text>
+export const DayForecastCard = observer(
+  ({dailyWeather, fontStyles}: CardProps) => {
+    return (
+      <>
+        <View>
+          <Text style={fontStyles}>{dailyWeather.weatherDate}</Text>
         </View>
+        <View style={styles.image_container}>
+          <Image
+            style={styles.image}
+            source={imagesLinks[dailyWeather.weather]}
+          />
 
-        <View style={styles.description_block}>
-          <Text style={styles.weather_info}>Cloud cover:</Text>
-          <Text style={styles.weather_info}>
-            {cloudCover[dailyWeather.cloudcover]}
-          </Text>
+          {dailyWeather.wind10m.speed > 5 && (
+            <Image source={imagesLinks.wind} />
+          )}
         </View>
+        <View style={styles.descriptions_container}>
+          <View style={styles.description_block}>
+            <Text style={fontStyles}>Temperature:</Text>
+            <Text style={fontStyles}>{dailyWeather.temp2m}C</Text>
+          </View>
 
-        <View style={styles.description_block}>
-          <Text style={styles.weather_info}>Humidity:</Text>
-          <Text style={styles.weather_info}>{dailyWeather.rh2m}</Text>
-        </View>
+          <View style={styles.description_block}>
+            <Text style={fontStyles}>Cloud cover:</Text>
+            <Text style={fontStyles}>
+              {cloudCover[dailyWeather.cloudcover]}
+            </Text>
+          </View>
 
-        <View style={styles.description_block}>
-          <Text style={styles.weather_info}>Precipitation:</Text>
-          <Text style={styles.weather_info}>
-            {precipitation[dailyWeather.prec_amount]}
-          </Text>
-        </View>
+          <View style={styles.description_block}>
+            <Text style={fontStyles}>Humidity:</Text>
+            <Text style={fontStyles}>{dailyWeather.rh2m}</Text>
+          </View>
 
-        <View style={styles.description_block}>
-          <Text style={styles.weather_info}>Wind: </Text>
-          <Text style={styles.weather_info}>
-            {windSpeed[dailyWeather.wind10m.speed]}{' '}
-            {dailyWeather.wind10m.direction}
-          </Text>
+          <View style={styles.description_block}>
+            <Text style={fontStyles}>Precipitation:</Text>
+            <Text style={fontStyles}>
+              {precipitation[dailyWeather.prec_amount]}
+            </Text>
+          </View>
+
+          <View style={styles.description_block}>
+            <Text style={fontStyles}>Wind: </Text>
+            <Text style={fontStyles}>
+              {windSpeed[dailyWeather.wind10m.speed]}{' '}
+              {dailyWeather.wind10m.direction}
+            </Text>
+          </View>
         </View>
-      </View>
-    </>
-  );
-});
+      </>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   data_container: {
     alignItems: 'center',
   },
-  date: {
-    fontSize: 20,
-  },
   image_container: {
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingVertical: 40,
+    paddingVertical: 30,
   },
   image: {
-    width: 130,
-    height: 130,
+    width: 110,
+    height: 110,
   },
   descriptions_container: {
     width: '100%',
@@ -95,14 +101,6 @@ const styles = StyleSheet.create({
   description_block: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  weather_info: {
-    paddingVertical: 5,
-    fontSize: 25,
-  },
-  weather_image: {
-    width: 130,
-    height: 130,
   },
   error_container: {
     justifyContent: 'center',
