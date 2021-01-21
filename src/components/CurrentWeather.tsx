@@ -1,13 +1,13 @@
 import React from 'react';
-import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {observer} from 'mobx-react-lite';
 import {Actions} from 'react-native-router-flux';
 import {LoadingScreen} from './LoadingScreen';
 import store from '../store/store';
-import {imagesLinks} from '../images/imagesLinks';
-import {cloudCover, precipitation, windSpeed} from '../store/valuesDefinition';
+import {DayForecastCard} from './DayForecastCard';
 
 export const CurrentWeather = observer(() => {
+  const currentDate = store.currentDate;
   const currentWeather: any =
     store.weatherData.length > 0 ? store.weatherData[0] : null;
 
@@ -33,52 +33,10 @@ export const CurrentWeather = observer(() => {
 
       {currentWeather && !store.loadingState && (
         <View style={styles.data_container}>
-          <View>
-            <Text style={styles.date}>{store.currentDate}</Text>
-          </View>
-          <View style={styles.image_container}>
-            <Image
-              style={styles.weather_image}
-              source={imagesLinks[currentWeather.weather]}
-            />
-
-            {currentWeather.wind10m.speed > 5 && (
-              <Image style={styles.weather_image} source={imagesLinks.wind} />
-            )}
-          </View>
-          <View>
-            <View style={styles.description_block}>
-              <Text style={styles.weather_info}>Temperature:</Text>
-              <Text style={styles.weather_info}>{currentWeather.temp2m}C</Text>
-            </View>
-
-            <View style={styles.description_block}>
-              <Text style={styles.weather_info}>Cloud cover:</Text>
-              <Text style={styles.weather_info}>
-                {cloudCover[currentWeather.cloudcover]}
-              </Text>
-            </View>
-
-            <View style={styles.description_block}>
-              <Text style={styles.weather_info}>Humidity:</Text>
-              <Text style={styles.weather_info}>{currentWeather.rh2m}</Text>
-            </View>
-
-            <View style={styles.description_block}>
-              <Text style={styles.weather_info}>Precipitation: </Text>
-              <Text style={styles.weather_info}>
-                {precipitation[currentWeather.prec_amount]}
-              </Text>
-            </View>
-
-            <View style={styles.description_block}>
-              <Text style={styles.weather_info}>Wind: </Text>
-              <Text style={styles.weather_info}>
-                {windSpeed[currentWeather.wind10m.speed]}{' '}
-                {currentWeather.wind10m.direction}
-              </Text>
-            </View>
-          </View>
+          <DayForecastCard
+            dailyWeather={{...currentWeather, weatherDate: currentDate}}
+            fontStyles={styles.weather_info}
+          />
         </View>
       )}
 
@@ -109,29 +67,14 @@ const styles = StyleSheet.create({
   },
   data_container: {
     alignItems: 'center',
-  },
-  date: {
-    fontSize: 20,
-  },
-  image_container: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingVertical: 40,
-  },
-  description_block: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  weather_info: {
-    paddingVertical: 5,
-    fontSize: 25,
-  },
-  weather_image: {
-    width: 130,
-    height: 130,
+    paddingHorizontal: 20,
   },
   error_container: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  weather_info: {
+    fontSize: 25,
+    paddingVertical: 8,
   },
 });
